@@ -244,7 +244,7 @@ if __name__ == "__main__":
         print(f" ERROR: this should be {result_expected}")
     print("")
     print(" - assignment 2")
-    result, result_expected = solution2(), 649862989626
+    result, result_expected = solution2(), 7030194981795
     print(f"  + result: {result}")
     if result != result_expected:
         print(f" ERROR: this should be {result_expected}")
