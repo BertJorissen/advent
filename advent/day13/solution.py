@@ -17,12 +17,13 @@ def solution(filename: str = "data.txt", smudge=False) -> int:
             buffer = []
     if buffer is not []:
         data_all.append(buffer)
-    if smudge:
+    if not smudge:
         return np.sum([process_mirror(mirror) for mirror in data_all])
     else:
-        return np.sum([pre_process_mirror(mirror) for mirror in data_all])
+        return np.sum([pre_process_horizontal(mirror) for mirror in data_all])
 
-def process_mirror(mirror) -> int:
+
+def transform(mirror) -> np.ndarray:
     allowed_keys = ".#"
     mmatrix = []
     for mline in mirror:
@@ -34,19 +35,47 @@ def process_mirror(mirror) -> int:
     mmatrix = np.array(mmatrix)
     m_x_len = mmatrix.shape[1]
     assert np.all(m_x_len == np.array([len(mline) for mline in mirror])), "Not all mirrors have the same length."
+    return mmatrix
 
-    return process_horizontal(mmatrix) * 100 + process_horizontal(mmatrix.T)
 
-def process_horizontal(mirror: np.ndarray) -> int:
+def process_mirror(mmatrix) -> int:
+    mmatrix = transform(mmatrix)
+    return process_horizontal(mmatrix)[0] * 100 + process_horizontal(mmatrix.T)[0]
+
+
+def process_horizontal(mirror: np.ndarray) -> Tuple[int, List[int], List[List[int]]]:
     already_mirror = 0
+    mirror_list = []
+    mrznge_lidt = []
     for mirror_line in range(1, mirror.shape[0]):
         mrange = np.min((mirror_line, mirror.shape[0]-mirror_line))
         if np.all(mirror[mirror_line-mrange:mirror_line] == np.flip(mirror[mirror_line:mirror_line+mrange], axis=0)):
-            if already_mirror != 0:
-                print(f"there already was a mirror, {mirror}")
+            mirror_list.append(mirror_line)
             already_mirror += mirror_line
-    return already_mirror
+            mrznge_lidt.append(np.arange(mirror_line-mrange+1, mirror_line+mrange+1).tolist())
+    return already_mirror, mirror_list, mrznge_lidt
 
+
+def pre_process_horizontal(mirror: np.ndarray) -> int:
+    mirror = transform(mirror)
+    couter = 0
+    mirror = mirror.T
+    for multply in [1, 100]:
+        idxll = process_horizontal(mirror)[0]
+        ccs = set([])
+        for idx in range(mirror.shape[0]):
+            for idy in range(mirror.shape[1]):
+                mirror[idx, idy] = not mirror[idx, idy]
+                _, gg1, gg2 = process_horizontal(mirror*1)
+                for g1, g2 in zip(gg1, gg2):
+                    if idx+1 in g2:
+                        print(idx+1, g1, g2)
+                        ccs.add(g1)
+                mirror[idx, idy] = not mirror[idx, idy]
+        couter += np.sum(list(ccs)) * multply
+        mirror = mirror.T
+        print(ccs, idxll)
+    return couter
 
 if __name__ == "__main__":
     print("================")
@@ -66,13 +95,13 @@ if __name__ == "__main__":
         print(f" ERROR: this should be {result_expected}")
     print("")
     print(" - testcase 2")
-    #result, result_expected = solution('test.txt', smudge=True), 400
+    result, result_expected = solution('test.txt', smudge=True), 400
     print(f"  + result: {result}")
     if result != result_expected:
         print(f" ERROR: this should be {result_expected}")
     print("")
     print(" - assignment 2")
-    #result, result_expected = solution2(smudge=True), 649862989626
+    result, result_expected = solution(smudge=True), 29341
     print(f"  + result: {result}")
     if result != result_expected:
         print(f" ERROR: this should be {result_expected}")
