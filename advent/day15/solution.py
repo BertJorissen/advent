@@ -6,24 +6,20 @@ from functools import cache
 def solution(filename: str = "data.txt", smudge=False) -> int:
     with open(filename, "r") as data:
         datatable = data.readlines()
-    d = datatable[0].strip().split(',')
-    return np.sum([ch(l) for l in d])
+    return np.sum(list(map(ch, datatable[0].strip().split(','))))
     
 
 def ch(s: str) -> int:
     out = 0
     for k in s:
-        out += ord(k)
-        out = out * 17
-        out = out % 256
+        out = ((out + ord(k)) * 17) % 256
     return out
 
 
 def solution2(filename: str = "data.txt", smudge=False) -> int:
     with open(filename, "r") as data:
         datatable = data.readlines()
-    d = datatable[0].strip().split(',')
-    steps: List[Tuple[str, int, bool, int]] = [process_one(l) for l in d]
+    steps: List[Tuple[str, int, bool, int]] = list(map(process_one, datatable[0].strip().split(',')))
     boxes: List[List[List[str, int]]] = [[] for _ in range(256)]
     for (label, hashstr, operation, lens) in steps:
         if operation:
