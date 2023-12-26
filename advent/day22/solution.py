@@ -144,8 +144,6 @@ def solution2(filename: str = "data.txt") -> int:
         if tmp or tmpf:
             if tmpff:
                 counter.add(ati)
-    print('ft', falling_table)
-    print('cd', connection_dict)
 
     out_removed = []
     for bi in range(len(datatable)):
